@@ -28,7 +28,32 @@ O Chat Service provê um canal de mensagens em tempo real para facilitar o alinh
 - Bull + Redis (fila assíncrona para moderação)
 
 ## Fluxo de Moderação:
-![Fluxo Mensagens e Moderação](./docs/architecture.png)
+![Fluxo Mensagens e Moderação](./docs/messages_moderation_diagram.png)
+
+## Pipeline de moderação (assíncrono)
+
+### 1) Normalização
+
+Antes de enviar à IA, aplicar normalizações para reduzir bypass:
+
+- reduzir espaços e separações artificiais
+- mapear substituições comuns (0→o, 1→i, @→a, etc.)
+- normalizar unicode (NFKC) e remover caracteres invisíveis
+
+### 2) Chamada à OpenAI Moderation
+
+- Enviar `contentNormalized` ao endpoint de moderação
+- Armazenar no documento o resultado resumido (categorias e score)
+
+### 3) Ações pós-moderação
+
+Se conteúdo for classificado como impróprio:
+
+- atualizar `status=FLAGGED` (ou REMOVED, conforme política)
+- inativar usuário (User Service) via HTTP interno
+- emitir evento `chat.message.flagged` para a sala
+- registrar log/auditoria do incidente
+
 
 ## Arquitetura
 O Chat Service está inserido na seguinte arquitetura:
@@ -114,32 +139,6 @@ Handshake deve receber:
   "status": "FLAGGED"
 }
 ```
-
-## Pipeline de moderação (assíncrono)
-
-### 1) Normalização
-
-Antes de enviar à IA, aplicar normalizações para reduzir bypass:
-
-- reduzir espaços e separações artificiais
-- mapear substituições comuns (0→o, 1→i, @→a, etc.)
-- normalizar unicode (NFKC) e remover caracteres invisíveis
-
-### 2) Chamada à OpenAI Moderation
-
-- Enviar `contentNormalized` ao endpoint de moderação
-- Armazenar no documento o resultado resumido (categorias e score)
-
-### 3) Ações pós-moderação
-
-Se conteúdo for classificado como impróprio:
-
-- atualizar `status=FLAGGED` (ou REMOVED, conforme política)
-- opcional: inativar/suspender usuário (User Service) via HTTP interno
-- emitir evento `chat.message.flagged` para a sala
-- registrar log/auditoria do incidente
-
-**Importante**: a moderação é pós-envio por decisão arquitetural (evitar bloqueio e aumentar disponibilidade do chat).
 
 ## Exemplo de cliente WebSocket
 
