@@ -1,0 +1,53 @@
+{
+  "name": "chat-service",
+  "version": "1.0.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "dev": "tsc --watch & ts-node -r tsconfig-paths/register src/main.ts"
+  },
+  "keywords": [
+    "chat",
+    "websocket",
+    "mongodb",
+    "nestjs",
+    "ride-sharing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "description": "Chat Service for Vai Comigo ride-sharing system",
+  "dependencies": {
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/mongoose": "^11.0.4",
+    "@nestjs/platform-ws": "^11.1.9",
+    "@nestjs/websockets": "^11.1.9",
+    "axios": "^1.13.2",
+    "bull": "^4.16.5",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.3",
+    "dotenv": "^17.2.3",
+    "mongoose": "^9.0.1",
+    "openai": "^6.14.0",
+    "redis": "^5.10.0",
+    "socket.io": "^4.8.1",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.14",
+    "@types/bull": "^3.15.9",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.3",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3"
+  }
+}

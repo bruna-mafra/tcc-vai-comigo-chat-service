@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7-alpine
+    container_name: chat-service-mongodb
+    environment:
+      MONGO_INITDB_DATABASE: vai-comigo-chat
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - chat-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: chat-service-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - chat-network
+
+  chat-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vai-comigo-chat-service
+    environment:
+      NODE_ENV: development
+      APP_PORT: 3001
+      MONGO_URI: mongodb://mongodb:27017/vai-comigo-chat
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LOG_LEVEL: debug
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - chat-network
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  chat-network:
+    driver: bridge
